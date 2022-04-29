@@ -52,16 +52,6 @@ public class Coordinate {
 		return true;
 	}
 	
-	//unknown method
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + x;
-		result = prime * result + y;
-		return result;
-	}
-	
 	@Override
 	public String toString() {
 		return "[x=" + x + ", y=" + y + "]";
