@@ -34,8 +34,6 @@ public class Coordinate {
 		return adjacentCoordinates;
 	}
 	
-	
-	//unknown method
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj)
