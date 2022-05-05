@@ -1,9 +1,13 @@
 package application;
 
+
 import java.util.ArrayList;
 import java.util.PriorityQueue;
 
+import javafx.animation.AnimationTimer;
 import javafx.geometry.Point2D;
+import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.paint.Color;
 
 public class Map {
 	private MapNode[][] m;
@@ -12,6 +16,7 @@ public class Map {
 	private PriorityQueue<MapNode> pq;
 	Point2D start, goal;
 	public ArrayList<MapNode> result;
+	public ArrayList<MapNode> traverseList;
 	Map(int r, int c){
 		m = new MapNode[r][c];
 		maxRow = r;
@@ -23,12 +28,12 @@ public class Map {
 			}
 		}
 		result = new ArrayList<MapNode>();
+		traverseList = new ArrayList<MapNode>();
+		
 	}
 
-	private double distance(MapNode a, MapNode b) {
-		double x = b.coord.getX() - a.coord.getX();
-		double y = b.coord.getY() - a.coord.getY();
-		return Math.sqrt(x * x + y * y);
+	private double heuristicScore(MapNode a, MapNode b) {
+		return Math.abs(a.r - b.r) + Math.abs(a.c - b.c);
 	}
 	public void setWall(double x, double y){
 		int r = (int)y/20;
@@ -46,7 +51,7 @@ public class Map {
 	public void setWall(int r, int c){
 		m[r][c].isWall = true;
 	}
-	public void AStar() {
+	public void AStar(GraphicsContext gc) {
 		System.out.println("start path find");
 		MapNode startNode = node(start);
 		MapNode endNode = node(goal);
@@ -59,9 +64,11 @@ public class Map {
 		while(pq.size() > 0) {
 			System.out.println("remove from pq");
 			MapNode currNode = pq.remove();
+			// add to animation
+			traverseList.add(currNode);
 			if (currNode == endNode) {
 				System.out.println("done");
-				print_path(endNode);
+				createResult(endNode);
 				return;
 			}
 			int[][] offset = {{0,1}, {1,0}, {-1,0}, {0,-1}};
@@ -74,28 +81,29 @@ public class Map {
 				MapNode neighNode = m[r][c];
 				if(neighNode.isWall)
 					continue;
-				double tmpG = currNode.g + distance(currNode, neighNode);
+				double tmpG = currNode.g + 1;
 				if(neighNode.g > tmpG) {
 					neighNode.prev = currNode;
 					neighNode.g = tmpG;
-					neighNode.f = neighNode.g + distance(startNode, neighNode);
+					neighNode.h = heuristicScore(endNode, neighNode);
+					neighNode.f = neighNode.g + neighNode.h;
 					if(pq.contains(neighNode)) {
 						pq.remove(neighNode);
 					}
 					pq.add(neighNode);
 				}
 					
-						
 			}		
 		}
 		System.out.println("failed");
 	}
-	private void print_path(MapNode endNode) {
+	
+	
+	private void createResult(MapNode endNode) {
 		if(endNode == null)
 			return;
-		System.out.println("(" + endNode.r +"," + endNode.c + ")");
-		result.add(endNode);
-		print_path(endNode.prev);
+		result.add(0, endNode);
+		createResult(endNode.prev);
 		
 	}
 
@@ -104,4 +112,52 @@ public class Map {
 		int c = (int)p.getX()/20;
 		return m[r][c];
 	}
+	
+	public void startAnimation(GraphicsContext gc) {
+		System.out.println("Start Animation");
+        AnimationTimer loop;
+        loop = new AnimationTimer() {
+        	double initSize = 15;
+        	double size = initSize;
+    		double speed = 1;
+    		double maxSize = 18;
+    		ArrayList<MapNode> currList = traverseList;
+    		MapNode curr = currList.remove(0);
+            @Override
+            public void handle(long now) {
+            	double x = curr.coord.getX();
+            	double y = curr.coord.getY();
+            	double midX = x + 10;
+        		double midY = y + 10;
+        		if(currList == result) {
+        			gc.setFill(Color.YELLOW);
+        		}
+        		else {
+        			gc.setFill(Color.LIGHTBLUE);
+        		}
+        		gc.fillRect(midX - size / 2, midY - size / 2, size, size);
+                
+                size+=speed;
+                if(size >= maxSize) {
+                	if(currList.isEmpty()) {
+                		if(currList == result) {
+                			this.stop();
+                		}
+                		else {
+                			currList = result;
+                			curr = currList.remove(0);
+                        	size = initSize;
+                		}
+                	} else {
+                		curr = currList.remove(0);
+                    	size = initSize;
+                	}
+            		
+                }
+            }
+
+        };
+        
+        loop.start();
+    }
 }

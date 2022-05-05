@@ -68,13 +68,14 @@ public class Controller {
 	public void pathFind(ActionEvent e) {
 		map.setGoal(endTarget.getLayoutX(), endTarget.getLayoutY());
 		map.setStart(startArrow.getLayoutX(), startArrow.getLayoutY());
-		map.AStar();
+		map.AStar(gc);
+		map.startAnimation(gc);
 		gc.setFill(Color.YELLOW);
-		for( MapNode node : map.result) {
-			double x = node.coord.getX();
-			double y = node.coord.getY();
-			gc.fillRect(x, y, 20, 20);
-		}
-		gc.setFill(Color.BLACK);
+//		for( MapNode node : map.result) {
+//			double x = node.coord.getX();
+//			double y = node.coord.getY();
+//			gc.fillRect(x, y, 20, 20);
+//		}
+//		gc.setFill(Color.BLACK);
 	}
 }
