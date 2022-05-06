@@ -51,6 +51,51 @@ public class Map {
 	public void setWall(int r, int c){
 		m[r][c].isWall = true;
 	}
+	public void Breadth_first(GraphicsContext gc) {
+		System.out.println("start path find");
+		MapNode startNode = node(start);
+		MapNode endNode = node(goal);
+		startNode.g = 0;
+		startNode.f = 0;
+		startNode.h = 0;
+		startNode.visited = true;
+		pq = new PriorityQueue<MapNode>(1, new AStarComparator());
+		pq.add(startNode);
+		while(pq.size() > 0) {
+			System.out.println("remove from pq");
+			MapNode currNode = pq.remove();
+			// add to animation
+			traverseList.add(currNode);
+			if (currNode == endNode) {
+				System.out.println("done");
+				createResult(endNode);
+				return;
+			}
+			int[][] offset = {{0,1}, {1,0}, {-1,0}, {0,-1}};//right down up left 
+			for(int i = 0; i < 4; i++) {
+				System.out.println("find neighbor");
+				int r = currNode.r + offset[i][0];
+				int c = currNode.c + offset[i][1];
+				if(r >= maxRow || r < 0 || c >= maxCol || c < 0)
+					continue;
+				MapNode neighNode = m[r][c];
+				if(neighNode.isWall)
+					continue;
+				double tmpG = currNode.g + 1;
+				if(neighNode.g > tmpG) {
+					neighNode.prev = currNode;
+					neighNode.g = tmpG;
+					neighNode.f = neighNode.g;
+					if(pq.contains(neighNode)) {
+						pq.remove(neighNode);
+					}
+					pq.add(neighNode);
+				}
+					
+			}		
+		}
+		System.out.println("failed");
+	}
 	public void AStar(GraphicsContext gc) {
 		System.out.println("start path find");
 		MapNode startNode = node(start);
