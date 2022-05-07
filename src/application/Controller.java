@@ -68,7 +68,8 @@ public class Controller {
 	public void pathFind(ActionEvent e) {
 		map.setGoal(endTarget.getLayoutX(), endTarget.getLayoutY());
 		map.setStart(startArrow.getLayoutX(), startArrow.getLayoutY());
-		map.AStar(gc);
+		//map.AStar(gc);
+		map.dijkstra(gc);
 		map.startAnimation(gc);
 		gc.setFill(Color.YELLOW);
 //		for( MapNode node : map.result) {
