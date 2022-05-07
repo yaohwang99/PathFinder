@@ -2,6 +2,9 @@ package application;
 
 
 import java.util.ArrayList;
+
+
+
 import java.util.PriorityQueue;
 
 import javafx.animation.AnimationTimer;
@@ -10,13 +13,14 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 public class Map {
-	private MapNode[][] m;
+	private MapNode[][] m;//m is an array of MapNode, with initialization later on(set g as max)
 	private int maxRow;
 	private int maxCol;
 	private PriorityQueue<MapNode> pq;
 	Point2D start, goal;
 	public ArrayList<MapNode> result;
 	public ArrayList<MapNode> traverseList;
+	public ArrayList<MapNode> passerList;//using to record checked node
 	Map(int r, int c){
 		m = new MapNode[r][c];
 		maxRow = r;
@@ -98,18 +102,22 @@ public class Map {
 	}
 	public void AStar(GraphicsContext gc) {
 		System.out.println("start path find");
+		//pointer points to start and end
 		MapNode startNode = node(start);
 		MapNode endNode = node(goal);
+		
+
 		startNode.g = 0;
 		startNode.f = 0;
 		startNode.h = 0;
 		startNode.visited = true;
-		pq = new PriorityQueue<MapNode>(1, new AStarComparator());
+		
+		//priority queue of MapNode
+		pq = new PriorityQueue<MapNode>(1, new DijkComparator());//parameter is initial capacity and a comparator?
 		pq.add(startNode);
 		while(pq.size() > 0) {
 			System.out.println("remove from pq");
 			MapNode currNode = pq.remove();
-			// add to animation
 			traverseList.add(currNode);
 			if (currNode == endNode) {
 				System.out.println("done");
@@ -121,7 +129,7 @@ public class Map {
 				System.out.println("find neighbor");
 				int r = currNode.r + offset[i][0];
 				int c = currNode.c + offset[i][1];
-				if(r >= maxRow || r < 0 || c >= maxCol || c < 0)
+				if(r >= maxRow || r < 0 || c >= maxCol || c < 0)//check boundary
 					continue;
 				MapNode neighNode = m[r][c];
 				if(neighNode.isWall)
@@ -138,6 +146,92 @@ public class Map {
 					pq.add(neighNode);
 				}
 					
+			}		
+		}
+		System.out.println("failed");
+	}
+	
+	public void dijkstra(GraphicsContext gc) {
+		System.out.println("start Dijkstra path find");
+		//pointer points to start and end
+		MapNode startNode = node(start);
+		MapNode endNode = node(goal);
+		
+		//only g matters in this algo and visited or not
+		startNode.g = 0;
+		startNode.f = 0;
+		startNode.h = 0;
+		startNode.visited = true;//now we visited start node
+		
+		//priority queue of MapNode to store those unvisited nodes
+		pq = new PriorityQueue<MapNode>(maxRow * maxCol, new DijkComparator());//parameter is initial capacity=1 and a comparator(according to g)
+		pq.add(endNode);
+		MapNode unvisitedNode; int i, j;
+		for(i = 0; i < maxRow; i++) {
+			for(j = 0; j < maxCol; j++) {
+				unvisitedNode = m[i][j];
+				if((unvisitedNode != startNode) && (unvisitedNode != endNode)) {
+					pq.add(unvisitedNode);
+				}
+			}
+		}
+		pq.add(startNode);
+		
+		MapNode preNode = startNode;
+		
+		//do(n - 1) rounds(including start initialization), with node number = n
+		//for(int round = 0; round < (maxRow * maxCol - 2); round++) 
+		while(pq.size() > 0){
+			System.out.println("remove from pq");
+			//take the node from the back
+			MapNode currNode;
+			//pq.comparator();//order pq
+			currNode = pq.remove();
+			System.out.println( "current: " + currNode.g);
+			if(currNode != startNode) {//points to the previous node
+				currNode.prev = preNode; preNode = currNode;
+			}
+			else {
+				currNode.prev = null;
+			}
+			currNode.visited = true;
+			traverseList.add(currNode);
+			
+			// because  currNode == endNode, we end, and add to animation, end successfully
+			if (currNode == endNode) {
+				System.out.println("done");
+				createResult(endNode);
+				return;
+			}
+			//if we haven't reached the end, we find the four neighbors and calculate the distance between currNode and its four neighbor
+			//implements relax()
+			int[][] offset = {{0,1}, {1,0}, {-1,0}, {0,-1}};
+			for(i = 0; i < 4; i++) {
+				System.out.println("find neighbor");
+				int r = currNode.r + offset[i][0];
+				int c = currNode.c + offset[i][1];
+				if(r >= maxRow || r < 0 || c >= maxCol || c < 0)//check boundary
+					continue;
+				
+				MapNode neighNode = m[r][c];//call the neighbor with specific position, and use neighNode to reference to it
+				if(neighNode.isWall)
+					continue;
+				if(!(pq.contains(neighNode))) {//means neighNode is visited
+					continue;
+				}
+				
+				double tmpG = currNode.g + 1;//start to currNode + 1, using this to update shortest path
+				if((!(neighNode.visited)) && (neighNode.g > tmpG)) {
+					//neighNode.prev = currNode;
+					neighNode.g = tmpG;
+					neighNode.h = 0;
+					neighNode.f = neighNode.g + neighNode.h;
+				}
+				//insert back
+				if(pq.contains(neighNode)) {
+					pq.remove(neighNode);
+				}
+				pq.add(neighNode);
 			}		
 		}
 		System.out.println("failed");
