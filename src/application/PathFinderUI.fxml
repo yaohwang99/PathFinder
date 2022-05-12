@@ -20,6 +20,11 @@
                   <Image url="@start_arrow.png" />
                </image>
             </ImageView>
+            <ImageView fx:id="checkPoint" fitHeight="20.0" fitWidth="20.0" layoutX="562.0" layoutY="221.0" onMouseDragged="#moveImageView" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@checkpoint.png" />
+               </image>
+            </ImageView>
             <ImageView fx:id="endTarget" fitHeight="20.0" fitWidth="20.0" layoutX="903.0" layoutY="281.0" onMouseDragged="#moveImageView" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@end_target.png" />
