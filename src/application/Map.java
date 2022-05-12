@@ -113,7 +113,7 @@ public class Map {
 		startNode.visited = true;
 		
 		//priority queue of MapNode
-		pq = new PriorityQueue<MapNode>(1, new DijkComparator());//parameter is initial capacity and a comparator?
+		pq = new PriorityQueue<MapNode>(1, new AStarComparator());//parameter is initial capacity and a comparator?
 		pq.add(startNode);
 		while(pq.size() > 0) {
 			System.out.println("remove from pq");
@@ -124,7 +124,7 @@ public class Map {
 				createResult(endNode);
 				return;
 			}
-			int[][] offset = {{0,1}, {1,0}, {-1,0}, {0,-1}};
+			int[][] offset = {{0,1}, {-1,0}, {0,-1}, {1,0}};
 			for(int i = 0; i < 4; i++) {
 				System.out.println("find neighbor");
 				int r = currNode.r + offset[i][0];
@@ -256,10 +256,11 @@ public class Map {
 		System.out.println("Start Animation");
         AnimationTimer loop;
         loop = new AnimationTimer() {
-        	double initSize = 15;
+        	double initSize = 0;
         	double size = initSize;
-    		double speed = 1;
+    		double speed = 2;
     		double maxSize = 18;
+    		double hue = 185;
     		ArrayList<MapNode> currList = traverseList;
     		MapNode curr = currList.remove(0);
             @Override
@@ -268,22 +269,21 @@ public class Map {
             	double y = curr.coord.getY();
             	double midX = x + 10;
         		double midY = y + 10;
-        		if(currList == result) {
-        			gc.setFill(Color.YELLOW);
-        		}
-        		else {
-        			gc.setFill(Color.LIGHTBLUE);
-        		}
-        		gc.fillRect(midX - size / 2, midY - size / 2, size, size);
-                
-                size+=speed;
+        		
+        		gc.setFill(Color.hsb(hue, 1.0 * size / maxSize, 1.0 * size / maxSize));
+        		gc.fillOval(midX - size / 2, midY - size / 2, size, size);
+        		
                 if(size >= maxSize) {
+                	assert (size == maxSize);
+                	gc.fillRect(midX - maxSize / 2, midY - maxSize / 2, maxSize, maxSize);
+                	System.out.println("size: " + size);
                 	if(currList.isEmpty()) {
                 		if(currList == result) {
                 			this.stop();
                 		}
                 		else {
                 			currList = result;
+                			hue = 60;
                 			curr = currList.remove(0);
                         	size = initSize;
                 		}
@@ -291,8 +291,8 @@ public class Map {
                 		curr = currList.remove(0);
                     	size = initSize;
                 	}
-            		
                 }
+                size+=speed;
             }
 
         };
