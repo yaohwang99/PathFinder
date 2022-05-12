@@ -19,6 +19,9 @@ public class Controller {
 	@FXML
 	private ImageView endTarget;
 	
+	@FXML
+	private ImageView checkPoint;
+	
 	private GraphicsContext gc;
 	
 	private Map map;
@@ -57,6 +60,7 @@ public class Controller {
         map = new Map(maxRow, maxCol);
         fitGrid(startArrow);
         fitGrid(endTarget);
+        fitGrid(checkPoint);
         
 	}
 	public void draw(MouseEvent e) {
@@ -65,9 +69,17 @@ public class Controller {
 		gc.fillRect(x, y, 20, 20);
 		map.setWall(x, y);
 	}
-	public void pathFind(ActionEvent e) {
-		map.setGoal(endTarget.getLayoutX(), endTarget.getLayoutY());
+	public void pathFind(ActionEvent e) {//with checkPoint
+		//first round
+		map.setGoal(checkPoint.getLayoutX(), checkPoint.getLayoutY());
 		map.setStart(startArrow.getLayoutX(), startArrow.getLayoutY());
+		map.AStar(gc);
+//		map.dijkstra(gc);
+		map.startAnimation(gc);
+		
+		//second round
+		map.setGoal(endTarget.getLayoutX(), endTarget.getLayoutY());
+		map.setStart(checkPoint.getLayoutX(), checkPoint.getLayoutY());
 		map.AStar(gc);
 //		map.dijkstra(gc);
 		map.startAnimation(gc);
