@@ -20,7 +20,7 @@ public class Map {
 	Point2D start, goal;
 	public ArrayList<MapNode> result;
 	public ArrayList<MapNode> traverseList;
-	public ArrayList<MapNode> passerList;//using to record checked node
+//	public ArrayList<MapNode> passerList;//using to record checked node
 	Map(int r, int c){
 		m = new MapNode[r][c];
 		maxRow = r;
@@ -177,7 +177,7 @@ public class Map {
 		}
 		pq.add(startNode);
 		
-		MapNode preNode = startNode;
+		//MapNode preNode = startNode;
 		
 		//do(n - 1) rounds(including start initialization), with node number = n
 		//for(int round = 0; round < (maxRow * maxCol - 2); round++) 
@@ -188,12 +188,7 @@ public class Map {
 			//pq.comparator();//order pq
 			currNode = pq.remove();
 			System.out.println( "current: " + currNode.g);
-			if(currNode != startNode) {//points to the previous node
-				currNode.prev = preNode; preNode = currNode;
-			}
-			else {
-				currNode.prev = null;
-			}
+			
 			currNode.visited = true;
 			traverseList.add(currNode);
 			
@@ -219,10 +214,9 @@ public class Map {
 				if(!(pq.contains(neighNode))) {//means neighNode is visited
 					continue;
 				}
-				
 				double tmpG = currNode.g + 1;//start to currNode + 1, using this to update shortest path
 				if((!(neighNode.visited)) && (neighNode.g > tmpG)) {
-					//neighNode.prev = currNode;
+					neighNode.prev = currNode;
 					neighNode.g = tmpG;
 					neighNode.h = 0;
 					neighNode.f = neighNode.g + neighNode.h;
@@ -235,6 +229,54 @@ public class Map {
 			}		
 		}
 		System.out.println("failed");
+	}
+	public int dfs_helper(MapNode start, MapNode end) {//dlr, return 0 means that we have reached endNode
+		//System.out.println("in helper");
+		
+		//visited this node
+		start.visited = true;
+		traverseList.add(start);
+		
+		if (start == end) {
+			System.out.println("done");
+			createResult(end);
+			return 0;
+		}
+		//find all the neighbor and recursion
+		int[][] offset = {{0,1}, {1,0}, {-1,0}, {0,-1}};
+		int i;
+		for(i = 0; i < 4; i++) {//find all the neighbors of nodestart, discover, color = gray
+			//System.out.println("find neighbor");
+			int r = start.r + offset[i][0];
+			int c = start.c + offset[i][1];
+			if(r >= maxRow || r < 0 || c >= maxCol || c < 0)//check boundary
+				continue;
+			
+			MapNode neighNode = m[r][c];//call the neighbor with specific position, and use neighNode to reference to it
+			if(neighNode.isWall)
+				continue;
+			
+			//if the neighbor is not visited, call the recursive method to visit it
+			if(!(neighNode.visited)) {
+				//System.out.println("row: " + neighNode.r + " column: " + neighNode.c);
+				neighNode.prev = start;
+				if(dfs_helper(neighNode, end) == 0) {
+					return 0;
+				}
+			}
+		}
+		System.out.println("failed");
+		return 0;
+		
+		
+	}
+	public void depth_first(GraphicsContext gc) {
+		System.out.println("start DFS path find");
+		//pointer points to start and end
+		MapNode startNode = node(start);
+		MapNode endNode = node(goal);
+		dfs_helper(startNode, endNode);
+		return;
 	}
 	
 	
