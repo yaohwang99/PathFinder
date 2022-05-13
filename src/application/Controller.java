@@ -73,15 +73,16 @@ public class Controller {
 		//first round
 		map.setGoal(checkPoint.getLayoutX(), checkPoint.getLayoutY());
 		map.setStart(startArrow.getLayoutX(), startArrow.getLayoutY());
+//		map.depth_first(gc);
 		map.AStar(gc);
 //		map.dijkstra(gc);
 		map.startAnimation(gc);
 		
-		//second round
+/*		//second round
 		map.setGoal(endTarget.getLayoutX(), endTarget.getLayoutY());
 		map.setStart(checkPoint.getLayoutX(), checkPoint.getLayoutY());
 		map.AStar(gc);
 //		map.dijkstra(gc);
-		map.startAnimation(gc);
+		map.startAnimation(gc);*/
 	}
 }
