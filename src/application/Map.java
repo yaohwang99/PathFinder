@@ -106,7 +106,6 @@ public class Map {
 		MapNode startNode = node(start);
 		MapNode endNode = node(goal);
 		
-
 		startNode.g = 0;
 		startNode.f = 0;
 		startNode.h = 0;
@@ -151,8 +150,10 @@ public class Map {
 		System.out.println("failed");
 	}
 	
+	//empty traverse list and result
 	public void dijkstra(GraphicsContext gc) {
 		System.out.println("start Dijkstra path find");
+		
 		//pointer points to start and end
 		MapNode startNode = node(start);
 		MapNode endNode = node(goal);
@@ -165,22 +166,10 @@ public class Map {
 		
 		//priority queue of MapNode to store those unvisited nodes
 		pq = new PriorityQueue<MapNode>(maxRow * maxCol, new DijkComparator());//parameter is initial capacity=1 and a comparator(according to g)
-		pq.add(endNode);
-		MapNode unvisitedNode; int i, j;
-		for(i = 0; i < maxRow; i++) {
-			for(j = 0; j < maxCol; j++) {
-				unvisitedNode = m[i][j];
-				if((unvisitedNode != startNode) && (unvisitedNode != endNode)) {
-					pq.add(unvisitedNode);
-				}
-			}
-		}
 		pq.add(startNode);
-		
-		//MapNode preNode = startNode;
+		System.out.println("start" + startNode.g);
 		
 		//do(n - 1) rounds(including start initialization), with node number = n
-		//for(int round = 0; round < (maxRow * maxCol - 2); round++) 
 		while(pq.size() > 0){
 			System.out.println("remove from pq");
 			//take the node from the back
@@ -200,6 +189,7 @@ public class Map {
 			}
 			//if we haven't reached the end, we find the four neighbors and calculate the distance between currNode and its four neighbor
 			//implements relax()
+			int i;
 			int[][] offset = {{0,1}, {1,0}, {-1,0}, {0,-1}};
 			for(i = 0; i < 4; i++) {
 				System.out.println("find neighbor");
@@ -209,11 +199,12 @@ public class Map {
 					continue;
 				
 				MapNode neighNode = m[r][c];//call the neighbor with specific position, and use neighNode to reference to it
-				if(neighNode.isWall)
-					continue;
-				if(!(pq.contains(neighNode))) {//means neighNode is visited
+				if(neighNode.isWall) {
+					System.out.println("is wall");
 					continue;
 				}
+				if(neighNode.visited == true)
+					continue;
 				double tmpG = currNode.g + 1;//start to currNode + 1, using this to update shortest path
 				if((!(neighNode.visited)) && (neighNode.g > tmpG)) {
 					neighNode.prev = currNode;
@@ -231,8 +222,6 @@ public class Map {
 		System.out.println("failed");
 	}
 	public int dfs_helper(MapNode start, MapNode end) {//dlr, return 0 means that we have reached endNode
-		//System.out.println("in helper");
-		
 		//visited this node
 		start.visited = true;
 		traverseList.add(start);
@@ -267,8 +256,6 @@ public class Map {
 		}
 		System.out.println("failed");
 		return 0;
-		
-		
 	}
 	public void depth_first(GraphicsContext gc) {
 		System.out.println("start DFS path find");
@@ -297,7 +284,7 @@ public class Map {
 	public void startAnimation(GraphicsContext gc) {
 		System.out.println("Start Animation");
         AnimationTimer loop;
-        loop = new AnimationTimer() {
+        loop = new AnimationTimer() {//define the implementation of abstract class Animation Timer, here we create a timer
         	double initSize = 0;
         	double size = initSize;
     		double speed = 2;
@@ -305,8 +292,9 @@ public class Map {
     		double hue = 185;
     		ArrayList<MapNode> currList = traverseList;
     		MapNode curr = currList.remove(0);
+    		
             @Override
-            public void handle(long now) {
+            public void handle(long now) {//since handle is an abstract method, we must override to implement it, with parameter of long(timeStamp now)
             	double x = curr.coord.getX();
             	double y = curr.coord.getY();
             	double midX = x + 10;
@@ -321,7 +309,9 @@ public class Map {
                 	System.out.println("size: " + size);
                 	if(currList.isEmpty()) {
                 		if(currList == result) {
-                			this.stop();
+                			//traverseList.clear();
+                			//result.clear();
+                			this.stop();//animation stops
                 		}
                 		else {
                 			currList = result;
@@ -329,7 +319,8 @@ public class Map {
                 			curr = currList.remove(0);
                         	size = initSize;
                 		}
-                	} else {
+                	}
+                	else {
                 		curr = currList.remove(0);
                     	size = initSize;
                 	}
@@ -338,7 +329,7 @@ public class Map {
             }
 
         };
-        
         loop.start();
+        
     }
 }
