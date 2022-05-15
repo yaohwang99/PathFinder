@@ -17,7 +17,7 @@ public class Map {
 	private int maxRow;
 	private int maxCol;
 	private PriorityQueue<MapNode> pq;
-	Point2D start, goal;
+	public Point2D start, goal, checkPoint;
 	public ArrayList<MapNode> result;
 	public ArrayList<MapNode> traverseList;
 //	public ArrayList<MapNode> passerList;//using to record checked node
@@ -35,6 +35,19 @@ public class Map {
 		traverseList = new ArrayList<MapNode>();
 		
 	}
+	/***
+	 * Reset attribute of MapNode to run shortest path algo at each round successfully
+	 */
+	public void clear() {
+		for (int row = 0; row < maxRow; row++) {
+			for(int col = 0; col < maxCol; col++) {
+				m[row][col].h = 0;
+				m[row][col].f = m[row][col].g = Double.MAX_VALUE;
+				m[row][col].visited = false;
+				m[row][col].prev = null;
+			}
+		}
+	}
 
 	private double heuristicScore(MapNode a, MapNode b) {
 		return Math.abs(a.r - b.r) + Math.abs(a.c - b.c);
@@ -43,6 +56,12 @@ public class Map {
 		int r = (int)y/20;
 		int c = (int)x/20;
 		m[r][c].isWall = true;
+		
+	}
+	public boolean isWall(double x, double y){
+		int r = (int)y/20;
+		int c = (int)x/20;
+		return (m[r][c].isWall);
 		
 	}
 	public void setStart(double x, double y){
@@ -54,6 +73,19 @@ public class Map {
 	}
 	public void setWall(int r, int c){
 		m[r][c].isWall = true;
+	}
+	public Point2D setCP(double x, double y){
+		int r = (int)y/20;
+		int c = (int)x/20;
+		m[r][c].checkPoint = true;
+		checkPoint = new Point2D(x, y);
+		return checkPoint;
+	}
+	public boolean isCheckPoint(double x, double y){
+		int r = (int)y/20;
+		int c = (int)x/20;
+		return (m[r][c].checkPoint);
+		
 	}
 	public void Breadth_first(GraphicsContext gc) {
 		System.out.println("start path find");
@@ -165,7 +197,7 @@ public class Map {
 		startNode.visited = true;//now we visited start node
 		
 		//priority queue of MapNode to store those unvisited nodes
-		pq = new PriorityQueue<MapNode>(maxRow * maxCol, new DijkComparator());//parameter is initial capacity=1 and a comparator(according to g)
+		pq = new PriorityQueue<MapNode>(maxRow * maxCol, new AStarComparator());//parameter is initial capacity=1 and a comparator(according to g)
 		pq.add(startNode);
 		System.out.println("start" + startNode.g);
 		
@@ -179,7 +211,7 @@ public class Map {
 			System.out.println( "current: " + currNode.g);
 			
 			currNode.visited = true;
-			traverseList.add(currNode);
+			traverseList.add(currNode);//if currNode is not in traverseList//////////////////
 			
 			// because  currNode == endNode, we end, and add to animation, end successfully
 			if (currNode == endNode) {
@@ -203,10 +235,13 @@ public class Map {
 					System.out.println("is wall");
 					continue;
 				}
-				if(neighNode.visited == true)
+				if(neighNode.visited == true) {
+					System.out.println("visited");
 					continue;
+				}
 				double tmpG = currNode.g + 1;//start to currNode + 1, using this to update shortest path
 				if((!(neighNode.visited)) && (neighNode.g > tmpG)) {
+					System.out.println("update weight");
 					neighNode.prev = currNode;
 					neighNode.g = tmpG;
 					neighNode.h = 0;
@@ -300,17 +335,22 @@ public class Map {
             	double midX = x + 10;
         		double midY = y + 10;
         		
-        		gc.setFill(Color.hsb(hue, 1.0 * size / maxSize, 1.0 * size / maxSize));
-        		gc.fillOval(midX - size / 2, midY - size / 2, size, size);
+        		if(!(isCheckPoint(x, y))) {
+        			gc.setFill(Color.hsb(hue, 1.0 * size / maxSize, 1.0 * size / maxSize));
+            		gc.fillOval(midX - size / 2, midY - size / 2, size, size);
+        		}
+        		
         		
                 if(size >= maxSize) {
                 	assert (size == maxSize);
-                	gc.fillRect(midX - maxSize / 2, midY - maxSize / 2, maxSize, maxSize);
-                	System.out.println("size: " + size);
+                	//if x, y is not check point
+                	if(!(isCheckPoint(x, y))) {
+                		gc.fillRect(midX - maxSize / 2, midY - maxSize / 2, maxSize, maxSize);
+                    	System.out.println("size: " + size);
+                	}
+                	
                 	if(currList.isEmpty()) {
                 		if(currList == result) {
-                			//traverseList.clear();
-                			//result.clear();
                 			this.stop();//animation stops
                 		}
                 		else {
