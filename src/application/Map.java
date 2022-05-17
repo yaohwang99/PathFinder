@@ -17,10 +17,10 @@ public class Map {
 	private int maxRow;
 	private int maxCol;
 	private PriorityQueue<MapNode> pq;
+	private AnimationTimer loop;
 	public Point2D start, goal, checkPoint;
 	public ArrayList<MapNode> result;
 	public ArrayList<MapNode> traverseList;
-//	public ArrayList<MapNode> passerList;//using to record checked node
 	Map(int r, int c){
 		m = new MapNode[r][c];
 		maxRow = r;
@@ -318,8 +318,16 @@ public class Map {
 	
 	public void startAnimation(GraphicsContext gc) {
 		System.out.println("Start Animation");
-        AnimationTimer loop;
-        loop = new AnimationTimer() {//define the implementation of abstract class Animation Timer, here we create a timer
+        createLoop(gc);
+        loop.start();
+        
+    }
+	public void stopLoop() {
+		if (loop != null)
+			loop.stop();
+	}
+	private void createLoop(GraphicsContext gc) {
+		loop = new AnimationTimer() {//define the implementation of abstract class Animation Timer, here we create a timer
         	double initSize = 0;
         	double size = initSize;
     		double speed = 1.0;
@@ -378,7 +386,5 @@ public class Map {
             }
 
         };
-        loop.start();
-        
-    }
+	}
 }

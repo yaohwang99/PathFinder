@@ -53,6 +53,8 @@ public class Controller {
 	 * Also used in clear()
 	 */
 	public void drawInit() {
+		if (map != null)
+			map.stopLoop();
 		gc = myCanvas.getGraphicsContext2D();
 
 		gc.setFill(Color.BLACK);
