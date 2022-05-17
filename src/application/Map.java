@@ -258,41 +258,59 @@ public class Map {
         loop = new AnimationTimer() {
         	double initSize = 0;
         	double size = initSize;
-    		double speed = 2;
+    		double speed = 1.0;
     		double maxSize = 18;
     		double hue = 185;
     		ArrayList<MapNode> currList = traverseList;
-    		MapNode curr = currList.remove(0);
+    		int idx = 0;
             @Override
             public void handle(long now) {
-            	double x = curr.coord.getX();
-            	double y = curr.coord.getY();
+            	double x = currList.get(idx).coord.getX();
+            	double y = currList.get(idx).coord.getY();
             	double midX = x + 10;
         		double midY = y + 10;
         		
-        		gc.setFill(Color.hsb(hue, 1.0 * size / maxSize, 1.0 * size / maxSize));
-        		gc.fillOval(midX - size / 2, midY - size / 2, size, size);
+        		for (int i = 0; size - speed * i > 0 ; i++) {
+        			if (idx + i >= currList.size() || size - speed * i < 0)
+        				break;
+        			x = currList.get(idx + i).coord.getX();
+                	y = currList.get(idx + i).coord.getY();
+                	midX = x + 10;
+            		midY = y + 10;
+            		double sat = Math.min((size - speed * i) / maxSize, 1.0);
+        			gc.setFill(Color.hsb(hue, sat, sat));
+            		gc.fillOval(midX - (size - speed * i) / 2, midY - (size - speed * i) / 2, (size - speed * i), (size - speed * i));
+        		}
         		
                 if(size >= maxSize) {
                 	assert (size == maxSize);
+                	gc.setFill(Color.hsb(hue, 1.0, 1.0));
+                	x = currList.get(idx).coord.getX();
+                	y = currList.get(idx).coord.getY();
+                	midX = x + 10;
+            		midY = y + 10;
                 	gc.fillRect(midX - maxSize / 2, midY - maxSize / 2, maxSize, maxSize);
-                	System.out.println("size: " + size);
-                	if(currList.isEmpty()) {
+                	if(idx >= currList.size() - 1) {
                 		if(currList == result) {
                 			this.stop();
                 		}
-                		else {
+                		else { // switch to result list
+                			if (result.isEmpty()) {
+                				this.stop();
+                			}
                 			currList = result;
+                			idx = 0;
                 			hue = 60;
-                			curr = currList.remove(0);
-                        	size = initSize;
+                        	size = 0;
                 		}
                 	} else {
-                		curr = currList.remove(0);
-                    	size = initSize;
+                		++idx;
+                    	size -= speed;
                 	}
+                } else {
+                	size+=speed;
                 }
-                size+=speed;
+                
             }
 
         };
