@@ -50,7 +50,7 @@ public class Controller {
 	}
 	/***
 	 * Draw the 2D table and place imageView
-	 * Also used in clear()
+	 * Also used in clear button
 	 */
 	public void drawInit() {
 		if (map != null)
@@ -154,11 +154,12 @@ public class Controller {
 			map.setGoal(checkPointNext.getX(), checkPointNext.getY());
 			
 //			map.depth_first(gc);
-//			map.AStar(gc);
-			map.dijkstra(gc);
-			map.startAnimation(gc);
+			map.AStar(gc);
+//			map.dijkstra(gc);
+			
 			
 			checkPoint = checkPointNext;
 		}
+		map.startAnimation(gc);
 	}
 }

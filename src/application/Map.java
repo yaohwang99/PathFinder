@@ -104,7 +104,7 @@ public class Map {
 			traverseList.add(currNode);
 			if (currNode == endNode) {
 				System.out.println("done");
-				createResult(endNode);
+				createResult(endNode, result.size());
 				return;
 			}
 			int[][] offset = {{0,1}, {1,0}, {-1,0}, {0,-1}};//right down up left 
@@ -152,7 +152,7 @@ public class Map {
 			traverseList.add(currNode);
 			if (currNode == endNode) {
 				System.out.println("done");
-				createResult(endNode);
+				createResult(endNode, result.size());
 				return;
 			}
 			int[][] offset = {{0,1}, {-1,0}, {0,-1}, {1,0}};
@@ -216,7 +216,7 @@ public class Map {
 			// because  currNode == endNode, we end, and add to animation, end successfully
 			if (currNode == endNode) {
 				System.out.println("done");
-				createResult(endNode);
+				createResult(endNode, result.size());
 				return;
 			}
 			//if we haven't reached the end, we find the four neighbors and calculate the distance between currNode and its four neighbor
@@ -263,7 +263,7 @@ public class Map {
 		
 		if (start == end) {
 			System.out.println("done");
-			createResult(end);
+			createResult(end, result.size());
 			return 0;
 		}
 		//find all the neighbor and recursion
@@ -301,12 +301,19 @@ public class Map {
 		return;
 	}
 	
-	
 	private void createResult(MapNode endNode) {
 		if(endNode == null)
 			return;
-		result.add(0, endNode);
+		result.add(endNode);
 		createResult(endNode.prev);
+		
+	}
+	
+	private void createResult(MapNode endNode, int last) {
+		if(endNode == null)
+			return;
+		result.add(last, endNode);
+		createResult(endNode.prev, last);
 		
 	}
 
@@ -316,9 +323,9 @@ public class Map {
 		return m[r][c];
 	}
 	
-	public void startAnimation(GraphicsContext gc) {
+	public synchronized void startAnimation(GraphicsContext gc) {
 		System.out.println("Start Animation");
-        createLoop(gc);
+		createLoop(gc);
         loop.start();
         
     }
