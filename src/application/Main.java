@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.stage.Stage;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 
 
 public class Main extends Application {
@@ -20,6 +21,10 @@ public class Main extends Application {
 			Controller controller = loader.getController();
 		    controller.drawInit();
 		    
+			Image iconPic = new Image(getClass().getResource("icon.png").toURI().toString());
+			primaryStage.getIcons().add(iconPic);		
+			primaryStage.setTitle("Path Visualizer");
+			
 			primaryStage.setScene(scene);
 			primaryStage.show();
 		} catch(Exception e) {

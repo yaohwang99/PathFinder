@@ -17,10 +17,10 @@ public class Map {
 	private int maxRow;
 	private int maxCol;
 	private PriorityQueue<MapNode> pq;
-	Point2D start, goal;
+	public Point2D start, goal, checkPoint;
 	public ArrayList<MapNode> result;
 	public ArrayList<MapNode> traverseList;
-	public ArrayList<MapNode> passerList;//using to record checked node
+//	public ArrayList<MapNode> passerList;//using to record checked node
 	Map(int r, int c){
 		m = new MapNode[r][c];
 		maxRow = r;
@@ -35,6 +35,19 @@ public class Map {
 		traverseList = new ArrayList<MapNode>();
 		
 	}
+	/***
+	 * Reset attribute of MapNode to run shortest path algo at each round successfully
+	 */
+	public void clear() {
+		for (int row = 0; row < maxRow; row++) {
+			for(int col = 0; col < maxCol; col++) {
+				m[row][col].h = 0;
+				m[row][col].f = m[row][col].g = Double.MAX_VALUE;
+				m[row][col].visited = false;
+				m[row][col].prev = null;
+			}
+		}
+	}
 
 	private double heuristicScore(MapNode a, MapNode b) {
 		return Math.abs(a.r - b.r) + Math.abs(a.c - b.c);
@@ -43,6 +56,12 @@ public class Map {
 		int r = (int)y/20;
 		int c = (int)x/20;
 		m[r][c].isWall = true;
+		
+	}
+	public boolean isWall(double x, double y){
+		int r = (int)y/20;
+		int c = (int)x/20;
+		return (m[r][c].isWall);
 		
 	}
 	public void setStart(double x, double y){
@@ -54,6 +73,19 @@ public class Map {
 	}
 	public void setWall(int r, int c){
 		m[r][c].isWall = true;
+	}
+	public Point2D setCP(double x, double y){
+		int r = (int)y/20;
+		int c = (int)x/20;
+		m[r][c].checkPoint = true;
+		checkPoint = new Point2D(x, y);
+		return checkPoint;
+	}
+	public boolean isCheckPoint(double x, double y){
+		int r = (int)y/20;
+		int c = (int)x/20;
+		return (m[r][c].checkPoint);
+		
 	}
 	public void Breadth_first(GraphicsContext gc) {
 		System.out.println("start path find");
@@ -106,7 +138,6 @@ public class Map {
 		MapNode startNode = node(start);
 		MapNode endNode = node(goal);
 		
-
 		startNode.g = 0;
 		startNode.f = 0;
 		startNode.h = 0;
@@ -151,8 +182,10 @@ public class Map {
 		System.out.println("failed");
 	}
 	
+	//empty traverse list and result
 	public void dijkstra(GraphicsContext gc) {
 		System.out.println("start Dijkstra path find");
+		
 		//pointer points to start and end
 		MapNode startNode = node(start);
 		MapNode endNode = node(goal);
@@ -164,23 +197,11 @@ public class Map {
 		startNode.visited = true;//now we visited start node
 		
 		//priority queue of MapNode to store those unvisited nodes
-		pq = new PriorityQueue<MapNode>(maxRow * maxCol, new DijkComparator());//parameter is initial capacity=1 and a comparator(according to g)
-		pq.add(endNode);
-		MapNode unvisitedNode; int i, j;
-		for(i = 0; i < maxRow; i++) {
-			for(j = 0; j < maxCol; j++) {
-				unvisitedNode = m[i][j];
-				if((unvisitedNode != startNode) && (unvisitedNode != endNode)) {
-					pq.add(unvisitedNode);
-				}
-			}
-		}
+		pq = new PriorityQueue<MapNode>(maxRow * maxCol, new AStarComparator());//parameter is initial capacity=1 and a comparator(according to g)
 		pq.add(startNode);
-		
-		MapNode preNode = startNode;
+		System.out.println("start" + startNode.g);
 		
 		//do(n - 1) rounds(including start initialization), with node number = n
-		//for(int round = 0; round < (maxRow * maxCol - 2); round++) 
 		while(pq.size() > 0){
 			System.out.println("remove from pq");
 			//take the node from the back
@@ -188,14 +209,9 @@ public class Map {
 			//pq.comparator();//order pq
 			currNode = pq.remove();
 			System.out.println( "current: " + currNode.g);
-			if(currNode != startNode) {//points to the previous node
-				currNode.prev = preNode; preNode = currNode;
-			}
-			else {
-				currNode.prev = null;
-			}
+			
 			currNode.visited = true;
-			traverseList.add(currNode);
+			traverseList.add(currNode);//if currNode is not in traverseList//////////////////
 			
 			// because  currNode == endNode, we end, and add to animation, end successfully
 			if (currNode == endNode) {
@@ -205,6 +221,7 @@ public class Map {
 			}
 			//if we haven't reached the end, we find the four neighbors and calculate the distance between currNode and its four neighbor
 			//implements relax()
+			int i;
 			int[][] offset = {{0,1}, {1,0}, {-1,0}, {0,-1}};
 			for(i = 0; i < 4; i++) {
 				System.out.println("find neighbor");
@@ -214,15 +231,18 @@ public class Map {
 					continue;
 				
 				MapNode neighNode = m[r][c];//call the neighbor with specific position, and use neighNode to reference to it
-				if(neighNode.isWall)
-					continue;
-				if(!(pq.contains(neighNode))) {//means neighNode is visited
+				if(neighNode.isWall) {
+					System.out.println("is wall");
 					continue;
 				}
-				
+				if(neighNode.visited == true) {
+					System.out.println("visited");
+					continue;
+				}
 				double tmpG = currNode.g + 1;//start to currNode + 1, using this to update shortest path
 				if((!(neighNode.visited)) && (neighNode.g > tmpG)) {
-					//neighNode.prev = currNode;
+					System.out.println("update weight");
+					neighNode.prev = currNode;
 					neighNode.g = tmpG;
 					neighNode.h = 0;
 					neighNode.f = neighNode.g + neighNode.h;
@@ -235,6 +255,50 @@ public class Map {
 			}		
 		}
 		System.out.println("failed");
+	}
+	public int dfs_helper(MapNode start, MapNode end) {//dlr, return 0 means that we have reached endNode
+		//visited this node
+		start.visited = true;
+		traverseList.add(start);
+		
+		if (start == end) {
+			System.out.println("done");
+			createResult(end);
+			return 0;
+		}
+		//find all the neighbor and recursion
+		int[][] offset = {{0,1}, {1,0}, {-1,0}, {0,-1}};
+		int i;
+		for(i = 0; i < 4; i++) {//find all the neighbors of nodestart, discover, color = gray
+			//System.out.println("find neighbor");
+			int r = start.r + offset[i][0];
+			int c = start.c + offset[i][1];
+			if(r >= maxRow || r < 0 || c >= maxCol || c < 0)//check boundary
+				continue;
+			
+			MapNode neighNode = m[r][c];//call the neighbor with specific position, and use neighNode to reference to it
+			if(neighNode.isWall)
+				continue;
+			
+			//if the neighbor is not visited, call the recursive method to visit it
+			if(!(neighNode.visited)) {
+				//System.out.println("row: " + neighNode.r + " column: " + neighNode.c);
+				neighNode.prev = start;
+				if(dfs_helper(neighNode, end) == 0) {
+					return 0;
+				}
+			}
+		}
+		System.out.println("failed");
+		return 0;
+	}
+	public void depth_first(GraphicsContext gc) {
+		System.out.println("start DFS path find");
+		//pointer points to start and end
+		MapNode startNode = node(start);
+		MapNode endNode = node(goal);
+		dfs_helper(startNode, endNode);
+		return;
 	}
 	
 	
@@ -255,7 +319,7 @@ public class Map {
 	public void startAnimation(GraphicsContext gc) {
 		System.out.println("Start Animation");
         AnimationTimer loop;
-        loop = new AnimationTimer() {
+        loop = new AnimationTimer() {//define the implementation of abstract class Animation Timer, here we create a timer
         	double initSize = 0;
         	double size = initSize;
     		double speed = 1.0;
@@ -292,7 +356,7 @@ public class Map {
                 	gc.fillRect(midX - maxSize / 2, midY - maxSize / 2, maxSize, maxSize);
                 	if(idx >= currList.size() - 1) {
                 		if(currList == result) {
-                			this.stop();
+                			this.stop();//animation stops
                 		}
                 		else { // switch to result list
                 			if (result.isEmpty()) {
@@ -314,7 +378,7 @@ public class Map {
             }
 
         };
-        
         loop.start();
+        
     }
 }
