@@ -10,11 +10,9 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.input.MouseDragEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
-import javafx.scene.shape.Rectangle;
 
 
 public class Controller {
@@ -161,5 +159,9 @@ public class Controller {
 			checkPoint = checkPointNext;
 		}
 		map.startAnimation(gc);
+	}
+	public void generateMaze(ActionEvent e) {
+		Maze maze = new Maze(map,gc);
+		maze.generate();
 	}
 }

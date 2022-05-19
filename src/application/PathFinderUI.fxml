@@ -11,7 +11,7 @@
    <children>
       <Button layoutX="350.0" layoutY="28.0" mnemonicParsing="false" onAction="#drawInit" text="Clear" />
       <Button layoutX="439.0" layoutY="28.0" mnemonicParsing="false" onAction="#pathFind" text="Start" />
-      <Button layoutX="566.0" layoutY="28.0" mnemonicParsing="false" text="Button" />
+      <Button layoutX="566.0" layoutY="28.0" mnemonicParsing="false" onAction="#generateMaze" text="Maze" />
       <Group layoutX="10.0" layoutY="70.0">
          <children>
             <Canvas fx:id="myCanvas" height="680.0" onMouseClicked="#setCheck" onMouseDragged="#draw" width="1200.0" />

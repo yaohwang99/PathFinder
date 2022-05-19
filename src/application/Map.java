@@ -13,14 +13,14 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
 public class Map {
-	private MapNode[][] m;//m is an array of MapNode, with initialization later on(set g as max)
-	private int maxRow;
-	private int maxCol;
+	public MapNode[][] m;//m is an array of MapNode, with initialization later on(set g as max)
+	public int maxRow;
+	public int maxCol;
 	private PriorityQueue<MapNode> pq;
 	private AnimationTimer loop;
-	public Point2D start, goal, checkPoint;
-	public ArrayList<MapNode> result;
-	public ArrayList<MapNode> traverseList;
+	private Point2D start, goal, checkPoint;
+	private ArrayList<MapNode> result;
+	private ArrayList<MapNode> traverseList;
 	Map(int r, int c){
 		m = new MapNode[r][c];
 		maxRow = r;
@@ -299,14 +299,6 @@ public class Map {
 		MapNode endNode = node(goal);
 		dfs_helper(startNode, endNode);
 		return;
-	}
-	
-	private void createResult(MapNode endNode) {
-		if(endNode == null)
-			return;
-		result.add(endNode);
-		createResult(endNode.prev);
-		
 	}
 	
 	private void createResult(MapNode endNode, int last) {
