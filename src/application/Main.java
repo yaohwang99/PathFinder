@@ -25,8 +25,22 @@ public class Main extends Application {
 			primaryStage.getIcons().add(iconPic);		
 			primaryStage.setTitle("Path Visualizer");
 			
+			
+			//pop window
+			Stage popStage = new Stage();
+			FXMLLoader popLoader = new FXMLLoader(getClass().getResource("popUpWindow.fxml"));
+			Parent popRoot = popLoader.load();
+			Scene popScene = new Scene(popRoot);
+			popScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			popStage.getIcons().add(iconPic);		
+			popStage.setTitle("Path Visualizer Manual");
+			popStage.setScene(popScene);
+			
+			
 			primaryStage.setScene(scene);
 			primaryStage.show();
+			
+			popStage.show();
 		} catch(Exception e) {
 			e.printStackTrace();
 		}

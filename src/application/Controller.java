@@ -1,18 +1,25 @@
 package application;
 
+import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.geometry.Point2D;
+import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.Color;
 import javafx.scene.paint.ImagePattern;
+import javafx.stage.Stage;
 
 
 public class Controller {
@@ -24,6 +31,11 @@ public class Controller {
 	@FXML
 	private ImageView endTarget;
 	private GraphicsContext gc;
+	
+	private Stage popStage;
+	private Parent popRoot;
+	private Scene popScene;
+	
 	
 	private Map map;
 	private int maxCol, maxRow;
@@ -48,7 +60,6 @@ public class Controller {
 	}
 	/***
 	 * Draw the 2D table and place imageView
-	 * Also used in clear button
 	 */
 	public void drawInit() {
 		if (map != null)
@@ -73,10 +84,54 @@ public class Controller {
         map = new Map(maxRow, maxCol);
         fitGrid(startArrow);
         fitGrid(endTarget);
-        //fitGrid(checkPoint);
 	}
-	
-	
+	/***
+	 * Show pop up window after clicking "help" button in PathFindingUI
+	 * @param e
+	 * @throws IOException
+	 * @throws URISyntaxException
+	 */
+	public void popUp(MouseEvent e) throws IOException, URISyntaxException {
+		popStage = new Stage();
+		FXMLLoader popLoader = new FXMLLoader(getClass().getResource("popUpWindow.fxml"));
+		popRoot = popLoader.load();
+		popScene = new Scene(popRoot);
+		popScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		Image iconPic;
+		iconPic = new Image(getClass().getResource("icon.png").toURI().toString());
+		popStage.getIcons().add(iconPic);
+			
+		popStage.setTitle("Path Visualizer Manual");
+		popStage.setScene(popScene);
+		popStage.show();
+	}
+	/***
+	 * switch to scene 2
+	 * @throws IOException 
+	 */
+	public void switchScene2(MouseEvent e) throws IOException {
+		popRoot = FXMLLoader.load(getClass().getResource("popUpWindow2.fxml"));
+		popStage = (Stage)((Node)e.getSource()).getScene().getWindow();
+		popScene = new Scene(popRoot);
+		popScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		popStage.setScene(popScene);
+		popStage.show();
+	}
+	public void switchScene3(MouseEvent e) throws IOException {
+		popRoot = FXMLLoader.load(getClass().getResource("popUpWindow3.fxml"));
+		popStage = (Stage)((Node)e.getSource()).getScene().getWindow();
+		popScene = new Scene(popRoot);
+		popScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		popStage.setScene(popScene);
+		popStage.show();
+	}
+	public void switchScene4(MouseEvent e) throws IOException {
+		popRoot = FXMLLoader.load(getClass().getResource("popUpWindow4.fxml"));
+		popStage = (Stage)((Node)e.getSource()).getScene().getWindow();
+		popScene = new Scene(popRoot);
+		popStage.setScene(popScene);
+		popStage.show();
+	}
 	
 	/***
 	 * Draw the walls
@@ -146,7 +201,6 @@ public class Controller {
 			
 			System.out.println("***New coord" + checkPoint.getX() + " y: " + checkPoint.getY());
 			System.out.println("***New coord Next" + checkPointNext.getX() + " y: " + checkPointNext.getY());
-			System.out.println();
 			
 			map.setStart(checkPoint.getX(), checkPoint.getY());
 			map.setGoal(checkPointNext.getX(), checkPointNext.getY());
