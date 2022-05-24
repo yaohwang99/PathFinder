@@ -11,15 +11,62 @@ import javafx.scene.paint.Color;
 public class Maze{
 	ArrayList<MapNode> wallList;
 	Map map;
+	MapNode[][] m;
 	GraphicsContext gc;
 	AnimationTimer loop;
+	private Stack<int[]> stk;
 	Maze(Map map, GraphicsContext gc){
 		this.map = map;
 		this.gc = gc;
 		wallList = new ArrayList<MapNode>();
 	}
+	private boolean drawVertical(int width, int height, int r1, int c1, int r2, int c2) {
+		Random rdm = new Random();
+		int pos = rdm.nextInt(width - 2) + c1 + 1;
+		int empty = rdm.nextInt(height) + r1;
+		int cnt = 0;
+		while (!m[r1 - 1][pos].isWall || !m[r2][pos].isWall) {
+			pos = rdm.nextInt(width - 2) + c1 + 1;
+			if(cnt++>100) {
+				System.out.println("Maze is wrong");
+				return false;
+			}
+				
+		}
+		for (int row = r1; row < r2; row++) {
+			if(row == empty)
+				continue;
+			wallList.add(m[row][pos]);
+			m[row][pos].isWall = true;
+		}
+		stk.push(new int[]{r1, c1, r2, pos});
+		stk.push(new int[]{r1, pos + 1, r2, c2});
+		return true;
+	}
+	private boolean drawHorizontol(int width, int height, int r1, int c1, int r2, int c2) {
+		Random rdm = new Random();
+		int empty = rdm.nextInt(width) + c1;
+		int pos = rdm.nextInt(height - 2) + r1 + 1;
+		int cnt = 0;
+		while (!m[pos][c1 - 1].isWall || !m[pos][c2].isWall) {
+			pos = rdm.nextInt(height - 2) + r1 + 1;
+			if(cnt++>100) {
+				System.out.println("Maze is wrong");
+				return false;
+			}
+		}
+		for (int col = c1; col < c2; col++) {
+			if(col == empty)
+				continue;
+			wallList.add(m[pos][col]);
+			m[pos][col].isWall = true;
+		}
+		stk.push(new int[]{r1, c1, pos, c2});
+		stk.push(new int[]{pos + 1, c1, r2, c2});
+		return true;
+	}
 	public void generate() {
-		MapNode[][] m = map.m;
+		m = map.m;
 		int maxCol = map.maxCol;
 		int maxRow = map.maxRow;
 		for (int col = 0; col < maxCol; col++) {
@@ -38,47 +85,29 @@ public class Maze{
 			wallList.add(m[row][0]);
 			m[row][0].isWall = true;
 		}
-		Stack<int[]> stk = new Stack<int[]>();
+		stk = new Stack<int[]>();
 		stk.push(new int[]{1,1,maxRow - 1, maxCol - 1});
 		while(!stk.isEmpty()) {
 			int[] tmp = stk.pop();
 			int r1 = tmp[0], c1 = tmp[1], r2 = tmp[2], c2 = tmp[3];
 			int width = c2 - c1, height = r2 - r1;
 			Random rdm = new Random();
-			if(width < 3 || height < 3 || (height == 3 && width == 3))
+			if(width < 3 || height < 3)
 				continue;
 			int dir = 2;
 			if (width == height) {
 				dir = rdm.nextInt(1);
 			}
 			if (width > height || dir == 0) { //draw vertical wall
-				int pos = rdm.nextInt(width - 2) + c1 + 1;
-				int empty = rdm.nextInt(height) + r1;
-				while (!m[r1 - 1][pos].isWall || !m[r2][pos].isWall) {
-					pos = rdm.nextInt(width - 2) + c1 + 1;
+				if(!drawVertical(width, height, r1, c1, r2, c2)) {
+					if(height > 2)
+						drawHorizontol(width, height, r1, c1, r2, c2);
 				}
-				for (int row = r1; row < r2; row++) {
-					if(row == empty)
-						continue;
-					wallList.add(m[row][pos]);
-					m[row][pos].isWall = true;
-				}
-				stk.push(new int[]{r1, c1, r2, pos});
-				stk.push(new int[]{r1, pos + 1, r2, c2});
 			} else if (height > width || dir == 1) {
-				int empty = rdm.nextInt(width) + c1;
-				int pos = rdm.nextInt(height - 2) + r1 + 1;
-				while (!m[pos][c1 - 1].isWall || !m[pos][c2].isWall) {
-					pos = rdm.nextInt(height - 2) + r1 + 1;
+				if(!drawHorizontol(width, height, r1, c1, r2, c2)) {
+					if(width > 2)
+						drawVertical(width, height, r1, c1, r2, c2);
 				}
-				for (int col = c1; col < c2; col++) {
-					if(col == empty)
-						continue;
-					wallList.add(m[pos][col]);
-					m[pos][col].isWall = true;
-				}
-				stk.push(new int[]{r1, c1, pos, c2});
-				stk.push(new int[]{pos + 1, c1, r2, c2});
 			}
 			
 		}

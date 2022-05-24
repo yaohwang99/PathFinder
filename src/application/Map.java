@@ -163,7 +163,7 @@ public class Map {
 				if(r >= maxRow || r < 0 || c >= maxCol || c < 0)//check boundary
 					continue;
 				MapNode neighNode = m[r][c];
-				if(neighNode.isWall)
+				if(neighNode.isWall && neighNode != endNode)
 					continue;
 				double tmpG = currNode.g + 1;
 				if(neighNode.g > tmpG) {
