@@ -1,6 +1,7 @@
 package application;
 
 
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 
@@ -10,7 +11,9 @@ import java.util.PriorityQueue;
 import javafx.animation.AnimationTimer;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
+import javafx.scene.paint.ImagePattern;
 
 public class Map {
 	public MapNode[][] m;//m is an array of MapNode, with initialization later on(set g as max)
@@ -21,6 +24,8 @@ public class Map {
 	private Point2D start, goal, checkPoint;
 	private ArrayList<MapNode> result;
 	private ArrayList<MapNode> traverseList;
+	private Image check;
+	private ImagePattern checkFill;
 	Map(int r, int c){
 		m = new MapNode[r][c];
 		maxRow = r;
@@ -33,7 +38,13 @@ public class Map {
 		}
 		result = new ArrayList<MapNode>();
 		traverseList = new ArrayList<MapNode>();
-		
+		try {
+			check = new Image(getClass().getResource("checkpoint.png").toURI().toString());
+			checkFill = new ImagePattern(check);
+		} catch (URISyntaxException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	/***
 	 * Reset attribute of MapNode to run shortest path algo at each round successfully
@@ -351,6 +362,13 @@ public class Map {
             		double sat = Math.min((size - speed * i) / maxSize, 1.0);
         			gc.setFill(Color.hsb(hue, sat, sat));
             		gc.fillOval(midX - (size - speed * i) / 2, midY - (size - speed * i) / 2, (size - speed * i), (size - speed * i));
+            		
+            		if (currList.get(idx + i).checkPoint) {
+            			gc.setFill(checkFill);
+	    				gc.fillRect(x, y, 20, 20);
+            		}
+            		
+    				
         		}
         		
                 if(size >= maxSize) {
@@ -361,6 +379,10 @@ public class Map {
                 	midX = x + 10;
             		midY = y + 10;
                 	gc.fillRect(midX - maxSize / 2, midY - maxSize / 2, maxSize, maxSize);
+                	if (currList.get(idx).checkPoint) {
+            			gc.setFill(checkFill);
+	    				gc.fillRect(x, y, 20, 20);
+            		}
                 	if(idx >= currList.size() - 1) {
                 		if(currList == result) {
                 			this.stop();//animation stops
