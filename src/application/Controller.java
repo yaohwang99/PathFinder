@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -14,6 +15,8 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.control.Button;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -23,7 +26,10 @@ import javafx.stage.Stage;
 
 
 public class Controller {
-	
+	@FXML
+	private Button start;
+	@FXML
+	private MenuButton choose_alg;
 	@FXML
 	private Canvas myCanvas;
 	@FXML
@@ -58,6 +64,20 @@ public class Controller {
 		iv.setLayoutY(roundto20(p.getY()));
 
 	}
+	public void init_menu_button() {
+        choose_alg.getItems().add(new MenuItem("Astar"));
+        choose_alg.getItems().add(new MenuItem("Breath-First-Search"));
+        choose_alg.getItems().add(new MenuItem("Dijkastra"));
+        choose_alg.getItems().add(new MenuItem("Deep-First-Search"));
+        ObservableList<MenuItem> items = choose_alg.getItems();
+        for(int i =0; i< items.size(); i++) {
+        	MenuItem item = items.get(i);
+        	item.setOnAction(event -> {
+        	    choose_alg.setText(item.getText());
+        	});
+        }
+        
+	}
 	/***
 	 * Draw the 2D table and place imageView
 	 */
@@ -84,6 +104,7 @@ public class Controller {
         map = new Map(maxRow, maxCol);
         fitGrid(startArrow);
         fitGrid(endTarget);
+        start.setDisable(false);
 	}
 	/***
 	 * Show pop up window after clicking "help" button in PathFindingUI
@@ -187,6 +208,7 @@ public class Controller {
 	
 	
 	public void pathFind(ActionEvent e) {
+		start.setDisable(true);
 		//add start at 0, and end target at the end
 		checkPoint = new Point2D(startArrow.getLayoutX(), startArrow.getLayoutY());
 		checkPointQueue.add(0, checkPoint);
@@ -204,10 +226,23 @@ public class Controller {
 			
 			map.setStart(checkPoint.getX(), checkPoint.getY());
 			map.setGoal(checkPointNext.getX(), checkPointNext.getY());
-			
-//			map.depth_first(gc);
-			map.AStar(gc);
-//			map.dijkstra(gc);
+
+			switch(choose_alg.getText()) {
+			case "Astar":
+				map.AStar(gc);
+				break;
+			case "Breath-First-Search":
+				map.Breadth_first(gc);
+				break;
+			case "Dijkastra":
+				map.dijkstra(gc);
+				break;
+			case "Deep-First-Search":
+				map.depth_first(gc);
+				break;
+			default:
+				return;
+			}
 			
 			
 			checkPoint = checkPointNext;

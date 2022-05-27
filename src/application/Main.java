@@ -20,6 +20,7 @@ public class Main extends Application {
 			
 			Controller controller = loader.getController();
 		    controller.drawInit();
+		    controller.init_menu_button();
 		    
 			Image iconPic = new Image(getClass().getResource("icon.png").toURI().toString());
 			primaryStage.getIcons().add(iconPic);		
