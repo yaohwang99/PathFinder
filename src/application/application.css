@@ -1,8 +1,14 @@
 /* JavaFX CSS - Leave this comment until you have at least create one rule which uses -fx-Property */
 .button{
-	-fx-background-radius: 5em;
 	-fx-background-color: "lightyellow";
 	-fx-font-family: "Comic Sans MS";
 	-fx-font-size: 15;
-	-fx-font-weight: bold;	
+	-fx-font-weight: bold;
+}
+.Button:pressed:hover{
+	-fx-background-color: #B6BBBE;
+}
+.Button:hover{
+	-fx-border-color: #7a7281;
+	-fx-border-weight: 0px 0px 3px 0px;
 }
