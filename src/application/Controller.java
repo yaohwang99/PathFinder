@@ -29,6 +29,8 @@ public class Controller {
 	@FXML
 	private Button start;
 	@FXML
+	private Button clear;
+	@FXML
 	private MenuButton choose_alg;
 	@FXML
 	private Canvas myCanvas;
@@ -65,15 +67,17 @@ public class Controller {
 
 	}
 	public void init_menu_button() {
+		start.setDisable(true);
         choose_alg.getItems().add(new MenuItem("Astar"));
         choose_alg.getItems().add(new MenuItem("Breath-First-Search"));
         choose_alg.getItems().add(new MenuItem("Dijkastra"));
-        choose_alg.getItems().add(new MenuItem("Deep-First-Search"));
+        choose_alg.getItems().add(new MenuItem("Depth-First-Search"));
         ObservableList<MenuItem> items = choose_alg.getItems();
         for(int i =0; i< items.size(); i++) {
         	MenuItem item = items.get(i);
         	item.setOnAction(event -> {
         	    choose_alg.setText(item.getText());
+        	    start.setDisable(false);
         	});
         }
         
@@ -105,6 +109,7 @@ public class Controller {
         fitGrid(startArrow);
         fitGrid(endTarget);
         start.setDisable(false);
+        
 	}
 	/***
 	 * Show pop up window after clicking "help" button in PathFindingUI
@@ -237,7 +242,7 @@ public class Controller {
 			case "Dijkastra":
 				map.dijkstra(gc);
 				break;
-			case "Deep-First-Search":
+			case "Depth-First-Search":
 				map.depth_first(gc);
 				break;
 			default:
@@ -250,7 +255,11 @@ public class Controller {
 		map.startAnimation(gc);
 	}
 	public void generateMaze(ActionEvent e) {
+		//start.setDisable(true);
+		//clear.setDisable(true);
 		Maze maze = new Maze(map,gc);
 		maze.generate();
+		//start.setDisable(false);
+		//clear.setDisable(false);
 	}
 }
