@@ -382,6 +382,7 @@ public class Map {
                 	if (currList.get(idx).checkPoint) {
             			gc.setFill(checkFill);
 	    				gc.fillRect(x, y, 20, 20);
+	    				hue+=10;
             		}
                 	if(idx >= currList.size() - 1) {
                 		if(currList == result) {

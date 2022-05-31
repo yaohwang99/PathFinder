@@ -28,7 +28,6 @@ public class Maze{
 		while (!m[r1 - 1][pos].isWall || !m[r2][pos].isWall) {
 			pos = rdm.nextInt(width - 2) + c1 + 1;
 			if(cnt++>100) {
-				System.out.println("Maze is wrong");
 				return false;
 			}
 				
@@ -51,7 +50,6 @@ public class Maze{
 		while (!m[pos][c1 - 1].isWall || !m[pos][c2].isWall) {
 			pos = rdm.nextInt(height - 2) + r1 + 1;
 			if(cnt++>100) {
-				System.out.println("Maze is wrong");
 				return false;
 			}
 		}
